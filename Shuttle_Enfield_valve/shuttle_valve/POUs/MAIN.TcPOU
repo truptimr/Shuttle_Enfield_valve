@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.16">
+  <POU Name="MAIN" Id="{5de7d031-bd33-4eb2-aa7e-811a57e3839e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	sts_spX AT %I*: REAL;
+	sts_spY AT %I*: REAL;
+	sts_spZ AT %I*: REAL;
+	sts_rbX AT %I*: REAL;
+	sts_rbY AT %I*: REAL;
+	sts_rbZ AT %I*: REAL;
+	sts_enable AT %I*: BOOL;
+	sts_close_loop AT %I*: BOOL;
+	sts_hb AT %I*: UDINT;
+	sts_pwm1 AT %I*: REAL;
+	sts_pwm2 AT %I*: REAL;
+	sts_pwm3 AT %I*: REAL;
+	
+    err_force_minmax AT %I*: BOOL;
+	err_force_step AT %I*: BOOL;
+	err_follow_error AT %I*: BOOL;
+	err_calibrated AT %I*: BOOL;
+	err_masterhb AT %I*: BOOL;
+	err_soc AT %I*: BOOL;
+	err_dongle AT %I*: BOOL;
+	
+	cmd_spX AT %Q*: REAL;
+	cmd_spY AT %Q*: REAL;
+	cmd_spZ AT %Q*: REAL;
+	cmd_enable AT %Q*: BOOL;
+	cmd_close_loop AT %Q*: BOOL;
+	cmd_hb AT %Q*: UDINT;
+	
+	cmd_clear_error : BOOL;
+	pwm_flag : BOOL := TRUE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[MAIN.cmd_hb := MAIN.cmd_hb + 1;
+
+IF pwm_flag = TRUE THEN
+//	pwm_flag := FALSE;
+	cmd_spX := 50;
+	cmd_spY := 50;
+	cmd_spZ := 50;	
+END_IF
+
+IF pwm_flag = FALSE THEN
+//	pwm_flag := TRUE;
+	cmd_spX := -50;
+	cmd_spY := -50; 
+	cmd_spZ := -50;	
+END_IF
+
+pwm_flag := NOT(pwm_flag);]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="2" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="48" Count="5" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="55" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

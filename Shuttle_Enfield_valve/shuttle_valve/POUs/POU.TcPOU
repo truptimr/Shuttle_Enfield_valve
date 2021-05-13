@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.6">
+  <POU Name="POU" Id="{aa86d538-26fc-44ce-8b3c-6e1eedbbd9e8}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM POU
+VAR
+		
+
+        fbSdoWrite      : FB_EcCoESdoWrite;
+        //sNetId          : T_AmsNetId := ''; (* NetId of EtherCAT Master *) (* empty string == net id of the local device XXX does not work? *)
+        sNetId          : T_AmsNetId := '192.168.2.15.2.1'; (* NetId of EtherCAT Master *)
+        nSlaveAddr      : UINT := 1001; (* Port Number of EtherCAT Slave *)
+        nIndex          : WORD := 16#8006; (* CoE Object Index *)
+        nSubIndex       : BYTE := 1; (* Subindex of CoE Object *)
+        bExecute        : BOOL; (* rising edge starts writing to the CoE Object *)
+        bError          : BOOL;
+        nErrId          : UDINT;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+bExecute := MAIN.cmd_clear_error;
+
+fbSdoWrite(
+        sNetId          := sNetId,
+        nSlaveAddr      := nSlaveAddr,
+        nIndex          := nIndex,
+        nSubIndex       := nSubIndex,
+        pSrcBuf                 := ADR(MAIN.cmd_clear_error),
+        cbBufLen                := SIZEOF(MAIN.cmd_clear_error),
+        bExecute                := bExecute
+);
+
+IF NOT fbSdoWrite.bBusy THEN
+        bExecute := FALSE;
+        IF NOT bError THEN 
+                (* write successful *)
+                bError := FALSE;
+                nErrId := 0;
+        ELSE 
+                (* write failed *)
+                bError := fbSdoWrite.bError;
+                nErrId := fbSdoWrite.nErrId;
+        END_IF
+
+        fbSdoWrite(bExecute := FALSE);
+END_IF
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
